@@ -1,6 +1,6 @@
 # 🔍 Machine Learning Explained with Code and Visuals
 
-Welcome! This repository is a **beginner-friendly** and **intuitive walkthrough** of key machine learning concepts, backed with **mathematical explanations**, **real-world examples**, and **Python code + visualizations**. It is designed for students, professionals, and anyone interested in understanding how common ML models work — both **mathematically** and **practically**.
+Welcome! This repository explores key machine learning concepts, backed with **mathematical explanations**, **real-world examples**, and **Python code + visualizations**. It is designed for anyone interested in understanding how common ML models work — both **mathematically** and **practically**.
 
 ---
 
@@ -26,12 +26,7 @@ Each section includes theory, LaTeX-rendered math, and a real-world analogy:
 
 ## 📓 Files
 
-- `Logistic_Regression.ipynb` – Explanation + visualizations + real-life use cases
-- `SVM_Explained.ipynb` – Linear SVM with plots and step-by-step description
-- `KNN_Demo.ipynb` – Hands-on demo of K-Nearest Neighbors
-- `Naive_Bayes.ipynb` – Simplified walkthrough of the Naive Bayes model
-- `machine_learning_basics.Rmd` – RMarkdown version with LaTeX and markdown explanations
-
+The files are in RMD but running python code.
 ---
 
 ## 💡 How to Use
