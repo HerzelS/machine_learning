@@ -1,0 +1,191 @@
+---
+title: "KNN"
+author: "Mukandi Herzel Shingirirai"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_condaenv("base")
+```
+
+
+## Machine Learning
+
+### K Nearest Neighbours (kNN)
+
+#### **What is K-Nearest Neighbors (KNN)?**
+
+K-Nearest Neighbors (KNN) is a simple, intuitive machine learning algorithm used for both **classification** and **regression**. It works by predicting the output based on the **K nearest data points** to the input point.
+
+#### **How does KNN work?**
+
+1. **Choose the number of neighbors (K)**:
+   - We begin by choosing the number **K**. This represents the number of neighbors we will look at when making a prediction. A typical value for **K** is 3, 5, or 7.
+
+2. **Measure the distance**:
+   - The next step is to measure the **distance** between the data points. **Euclidean distance** is commonly used, but other distance metrics are also possible.
+
+3. **Find the nearest neighbors**:
+   - After calculating the distance, we identify the **K nearest neighbors** to the data point.
+
+4. **Make the prediction**:
+   - **For classification**: The point is assigned the most common class among its **K nearest neighbors**.
+   - **For regression**: The prediction is made by averaging the values of the K nearest neighbors.
+
+---
+
+### Import Packages
+
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import RandomOverSampler
+import warnings
+warnings.filterwarnings('ignore')
+```
+
+
+### Load and Explore the dataset
+
+```{python}
+# Create a list of columns to add them as column names, since the dataset does not have column names
+cols = ['fLength', 'fWidth', 'fSize', 'fConc', 'fConc1', 'fAsym', 'fM3Long', 'fM3Trans', 'fAlpha', 'fDist', 'class']
+df = pd.read_csv('data/magic04.data', names=cols)
+df.head()
+```
+
+
+```{python}
+# Check the class
+df["class"].unique()
+```
+
+```{python}
+# Lets convert "class" to numeric
+df["class"] = (df["class"] == "g").astype(int)
+```
+
+
+
+```{python}
+# Now let us recheck "class"
+df["class"].unique()
+```
+
+
+
+```{python}
+df.head()
+```
+
+
+
+```{python}
+for label in cols[:-1]:
+  plt.hist(df[df["class"] == 1][label], color="blue", label="gamma", alpha=0.7, density=True)
+  plt.hist(df[df["class"] == 0][label], color="red", label="hedron", alpha=0.7, density=True)
+  plt.title(label)
+  plt.ylabel("Probability")
+  plt.xlabel(label)
+  plt.legend()
+  plt.show()
+```
+
+
+
+## Preparing the Train, Validation and Test Datasets
+
+```{python}
+train, valid, test = np.split(df.sample(frac=1), [int(0.6*len(df)), int(0.8*len(df))])
+```
+
+
+
+```{python}
+def scale_dataset(dataframe, oversample=False):
+  x = dataframe[dataframe.columns[:-1]].values
+  y = dataframe[dataframe.columns[-1]].values
+
+  scaler = StandardScaler()
+  x = scaler.fit_transform(x)
+
+  if oversample:
+    x, y = RandomOverSampler().fit_resample(x, y)
+
+  # Create the whole data as a horizontal numpy array
+  data = np.hstack((x, np.reshape(y, (-1, 1))))
+
+  return data, x, y
+```
+
+
+
+
+```{python}
+print(len(train[train["class"] == 1])) # Gamma
+print(len(train[train["class"] == 0])) # Hadron
+```
+
+
+We want to oversample our data so that these match.
+
+```{python}
+train, x_train, y_train = scale_dataset(train, oversample=True)
+valid, x_valid, y_valid = scale_dataset(valid, oversample=False)
+test, x_test, y_test = scale_dataset(test, oversample=False)
+```
+
+
+```{python}
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report
+```
+
+
+```{python}
+knn_model = KNeighborsClassifier(n_neighbors = 5)
+knn_model.fit(x_train, y_train)
+```
+
+```{python}
+y_pred = knn_model.predict(x_test)
+```
+
+
+```{python}
+print(classification_report(y_test, y_pred))
+```
+
+
+
+
+* Accuracy is 80%
+* Prescision for hadron is 76% and gamma is 82%
+
+Precision:
+
+<div align="center">
+$$
+\text{Prescision} = \frac{\text{True positives}}{\text{True Positives} +
+\text{False Positives}}
+$$
+</div>
+
+
+Recall
+
+
+<div align="center">
+
+$$
+\text{Recall} = \frac{\text{True Postives}}{\text{False Negatives} +
+\text{True Positives}}
+$$
+
+</div>
