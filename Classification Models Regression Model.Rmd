@@ -12,7 +12,182 @@ use_condaenv("base")
 ```
 
 
-## Machine Learning
+### Logistic Regression
+
+### The basis for the Sigmoid function notation
+
+Sometimes we write the sigmoid more generally as:
+
+$$
+S(y) = \frac{1}{1 + e^{-y}}
+$$
+
+Where \( y = mx + b \). This gives us the classic **S-shaped curve** of logistic regression.
+
+<br>
+
+#### How can we model probability?
+
+<br>
+
+
+$$
+p = mx + b
+$$
+
+<br>
+
+However, the problem is that x can be from infnity to infinity while one of the rules for probability is that it has to stay between zero and 1.
+
+So instead of setting the probability, we can set the odds equal to this and it becomes a ratio:
+
+<br>
+
+$$
+\frac{p}{1 - p} = mx + b
+$$
+
+<br>
+
+This ratio is allowed to take on infinity values. However, still *mx + b* can still be negative. We fix that by takign the log of the odds:
+
+<br>
+
+$$
+ln(\frac{p}{1 - p}) = mx + b
+$$
+
+<br>
+
+How then do we solve for p - probability.
+
+<br>
+
+First thing is you can remove the log by taking the e:
+
+<br>
+
+$$
+_{e}ln(\frac{p}{1 - p}) = _{e}mx + b
+$$
+
+<br>
+
+thus:
+
+<br>
+
+$$
+\frac{P}{1-P} = _{e}mx + b
+$$
+
+<br>
+
+so:
+
+<br>
+
+$$
+P = (1-P)_{e}mx + b = {e}^{mx + b} - pe^{mx + b}
+$$
+<br>
+
+thus:
+
+<br>
+
+$$
+P(1 + e^{mx + b}) = e^{mx + b}
+$$
+<br>
+
+and:
+
+<br>
+
+$$
+p = \frac{e^{mx + b}}{1 + e^1}
+$$
+
+<br>
+
+To get a numerator of 1 on top:
+
+<br>
+
+$$
+p = \frac{e^{mx + b}}{1 + e^1} ⋅ \frac{e^{(-mx + b)}}{e^{(-mx + b)}}
+$$
+<br>
+
+Probability then becomes:
+
+<br>
+
+$$
+p = \frac{1}{1 + e^{(-mx + b)}}
+$$
+
+<br>
+
+This isa special function called the sigmoid function which looks like:
+
+<br>
+
+$$
+S(y) = \frac{1}{1 + e^{(-y)}}
+$$
+
+
+<br>
+The sigmoid function gives us the curved s that we find in logistic regression.
+
+<br>
+
+---
+
+
+### Real-Life Examples of Logistic Regression
+
+<br>
+
+1. **Email Spam Classification**  
+   - Input: Frequency of spammy words, sender reputation  
+   - Output: Probability that an email is spam (1 = spam, 0 = not spam)
+
+<br>
+
+2. **Loan Default Prediction**  
+   - Input: Credit score, income, loan amount  
+   - Output: Probability a person will default on their loan
+
+<br>
+
+3. **Medical Diagnosis**  
+   - Input: Age, blood pressure, test results  
+   - Output: Probability a patient has a disease (e.g., heart disease)
+
+<br>
+
+4. **Customer Churn**  
+   - Input: Usage patterns, support tickets, subscription duration  
+   - Output: Probability a customer will cancel the service
+
+<br>
+
+5. **Online Advertising**  
+   - Input: User demographics, ad features, time of day  
+   - Output: Probability that a user will click an ad
+
+---
+
+Logistic regression helps us answer **yes-or-no questions** based on input data — making it one of the most widely used classification tools in data science.
+
+<br>
+
+## Logistic Regression Model 
+
+<br>
 
 ### Import Packages
 
@@ -23,10 +198,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import RandomOverSampler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
 import warnings
 warnings.filterwarnings('ignore')
 ```
 
+<br>
 
 ### Load and Explore the dataset
 
@@ -37,31 +215,34 @@ df = pd.read_csv('data/magic04.data', names=cols)
 df.head()
 ```
 
+<br>
 
 ```{python}
 # Check the class
 df["class"].unique()
 ```
 
+<br>
+
 ```{python}
 # Lets convert "class" to numeric
 df["class"] = (df["class"] == "g").astype(int)
 ```
 
-
+<br>
 
 ```{python}
 # Now let us recheck "class"
 df["class"].unique()
 ```
 
-
+<br>
 
 ```{python}
 df.head()
 ```
 
-
+<br>
 
 ```{python}
 for label in cols[:-1]:
@@ -74,15 +255,17 @@ for label in cols[:-1]:
   plt.show()
 ```
 
+<br>
 
+### Example 1:  Preparing the Train, Validation and Test Datasets
 
-## Preparing the Train, Validation and Test Datasets
+<br>
 
 ```{python}
 train, valid, test = np.split(df.sample(frac=1), [int(0.6*len(df)), int(0.8*len(df))])
 ```
 
-
+<br>
 
 ```{python}
 def scale_dataset(dataframe, oversample=False):
@@ -101,14 +284,14 @@ def scale_dataset(dataframe, oversample=False):
   return data, x, y
 ```
 
-
-
+<br>
 
 ```{python}
 print(len(train[train["class"] == 1])) # Gamma
 print(len(train[train["class"] == 0])) # Hadron
 ```
 
+<br>
 
 We want to oversample our data so that these match.
 
@@ -118,197 +301,11 @@ valid, x_valid, y_valid = scale_dataset(valid, oversample=False)
 test, x_test, y_test = scale_dataset(test, oversample=False)
 ```
 
-### Logistic Regression
+<br>
 
-How can we model probability?
+### Example 2:  Preparing the Train, Validation and Test Datasets
 
-$$
-p = mx + b
-$$
-
-However, the problem is that x can be from infnity to infinity while one of the rules for probability is that it has to stay between zero and 1.
-
-So instead of setting the probability, we can set the odds equal to this and it becomes a ratio:
-
-$$
-\frac{p}{1 - p} = mx + b
-$$
-
-This ratio is allowed to take on infinity values. However, still *mx + b* can still be negative. We fix that by takign the log of the odds:
-
-$$
-ln(\frac{p}{1 - p}) = mx + b
-$$
-
-How then do we solve for p - probablity.
-
-First thing is you can remove the log by taking the e:
-$$
-_{e}ln(\frac{p}{1 - p}) = _{e}mx + b
-$$
-
-thus:
-
-$$
-\frac{P}{1-P} = _{e}mx + b
-$$
-
-so:
-
-$$
-P = (1-P)_{e}mx + b = {e}^{mx + b} - pe^{mx + b}
-$$
-
-thus:
-
-
-$$
-P(1 + e^{mx + b}) = e^{mx + b}
-$$
-
-and:
-
-$$
-p = \frac{e^{mx + b}}{1 + e^1}
-$$
-
-To get a numerator of 1 on top:
-
-$$
-p = \frac{e^{mx + b}}{1 + e^1} ⋅ \frac{e^{(-mx + b)}}{e^{(-mx + b)}}
-$$
-
-Probability then becomes:
-
-$$
-p = \frac{1}{1 + e^{(-mx + b)}}
-$$
-
-This isa special function called the sigmoid function which looks like:
-
-$$
-S(y) = \frac{1}{1 + e^{(-y)}}
-$$
-
-The sigmoid function gives us the curved s that we find in logistic regression.
-
-
-### 🚀 Logistic Regression – An Intuitive Introduction
-
-#### How can we model probability?
-
-Let’s start with a simple linear equation:
-
-$$
-p = mx + b
-$$
-
-But there’s a problem:  
-The left side, \( p \), represents a probability — and **probabilities must be between 0 and 1**.  
-However, the right side, \( mx + b \), can take on **any value** from \( -\infty \) to \( +\infty \).  
-This violates the basic rule of probabilities.
-
----
-
-#### So what do we do?  
-Instead of modeling the probability directly, we model the **odds** of the event happening:
-
-$$
-\text{Odds} = \frac{p}{1 - p}
-$$
-
-This ratio tells us how likely an event is to happen compared to it **not** happening.  
-The odds can range from 0 to \( +\infty \), which is better — but we can do even better.
-
----
-
-#### Let’s take it further: the log-odds (logit)
-
-We now apply the natural logarithm (ln) to the odds:
-
-$$
-\ln \left( \frac{p}{1 - p} \right) = mx + b
-$$
-
-This transforms the output to range from \( -\infty \) to \( +\infty \), which fits perfectly with a linear equation.  
-This transformation is called the **logit** function — and this is what logistic regression models.
-
----
-
-#### Solving for the probability \( p \)
-
-Now, let’s isolate \( p \). Starting from:
-
-$$
-\ln \left( \frac{p}{1 - p} \right) = mx + b
-$$
-
-We exponentiate both sides to cancel the log:
-
-$$
-\frac{p}{1 - p} = e^{mx + b}
-$$
-
-Now solve for \( p \):
-
-$$
-p = \frac{e^{mx + b}}{1 + e^{mx + b}}
-$$
-
----
-
-#### Simplifying to the sigmoid function
-
-The final form is:
-
-$$
-p = \frac{1}{1 + e^{-(mx + b)}}
-$$
-
-This function is called the **sigmoid** (or logistic) function. It maps any real value (from \( -\infty \) to \( +\infty \)) smoothly into the interval \( (0, 1) \).  
-That’s perfect for modeling probabilities.
-
----
-
-#### Sigmoid function notation
-
-Sometimes we write the sigmoid more generally as:
-
-$$
-S(y) = \frac{1}{1 + e^{-y}}
-$$
-
-Where \( y = mx + b \). This gives us the classic **S-shaped curve** of logistic regression.
-
----
-
-#### 📌 Real-Life Examples of Logistic Regression
-
-1. **Email Spam Classification**  
-   - Input: Frequency of spammy words, sender reputation  
-   - Output: Probability that an email is spam (1 = spam, 0 = not spam)
-
-2. **Loan Default Prediction**  
-   - Input: Credit score, income, loan amount  
-   - Output: Probability a person will default on their loan
-
-3. **Medical Diagnosis**  
-   - Input: Age, blood pressure, test results  
-   - Output: Probability a patient has a disease (e.g., heart disease)
-
-4. **Customer Churn**  
-   - Input: Usage patterns, support tickets, subscription duration  
-   - Output: Probability a customer will cancel the service
-
-5. **Online Advertising**  
-   - Input: User demographics, ad features, time of day  
-   - Output: Probability that a user will click an ad
-
----
-
-Logistic regression helps us answer **yes-or-no questions** based on input data — making it one of the most widely used classification tools in data science.
-
-
+<br>
 
 ```{python}
 import numpy as np
@@ -341,27 +338,19 @@ plt.legend()
 plt.show()
 ```
 
-
-```{python}
-from sklearn.linear_model import LogisticRegression
-```
-
+<br>
 
 ```{python}
 lg_model = LogisticRegression()
 lg_model = lg_model.fit(x_train, y_train)
 ```
 
+<br>
 
 ```{python}
 y_pred = lg_model.predict(x_test)
 print(classification_report(y_test, y_pred))
 ```
-
-
-
-
-
 
 
 

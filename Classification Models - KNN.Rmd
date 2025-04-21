@@ -12,15 +12,13 @@ use_condaenv("base")
 ```
 
 
-## Machine Learning
+## K Nearest Neighbours (kNN)
 
-### K Nearest Neighbours (kNN)
-
-#### **What is K-Nearest Neighbors (KNN)?**
+### **What is K-Nearest Neighbors (KNN)?**
 
 K-Nearest Neighbors (KNN) is a simple, intuitive machine learning algorithm used for both **classification** and **regression**. It works by predicting the output based on the **K nearest data points** to the input point.
 
-#### **How does KNN work?**
+### **How does KNN work?**
 
 1. **Choose the number of neighbors (K)**:
    - We begin by choosing the number **K**. This represents the number of neighbors we will look at when making a prediction. A typical value for **K** is 3, 5, or 7.
@@ -37,7 +35,11 @@ K-Nearest Neighbors (KNN) is a simple, intuitive machine learning algorithm used
 
 ---
 
+## Exploring KNN using the ... dataset
+
 ### Import Packages
+
+First we import the relevant packages:
 
 ```{python}
 import numpy as np
@@ -53,6 +55,8 @@ warnings.filterwarnings('ignore')
 
 ### Load and Explore the dataset
 
+We then load and explore the dataset.
+
 ```{python}
 # Create a list of columns to add them as column names, since the dataset does not have column names
 cols = ['fLength', 'fWidth', 'fSize', 'fConc', 'fConc1', 'fAsym', 'fM3Long', 'fM3Trans', 'fAlpha', 'fDist', 'class']
@@ -60,11 +64,14 @@ df = pd.read_csv('data/magic04.data', names=cols)
 df.head()
 ```
 
+Checking the class:
 
 ```{python}
 # Check the class
 df["class"].unique()
 ```
+
+Converting the class from string to int.
 
 ```{python}
 # Lets convert "class" to numeric
@@ -72,6 +79,7 @@ df["class"] = (df["class"] == "g").astype(int)
 ```
 
 
+Confirming the conversion:
 
 ```{python}
 # Now let us recheck "class"
@@ -85,6 +93,7 @@ df.head()
 ```
 
 
+### Ploting the various features to get a look at how they are distributed
 
 ```{python}
 for label in cols[:-1]:
@@ -126,6 +135,7 @@ def scale_dataset(dataframe, oversample=False):
 
 
 
+### Checking the length
 
 ```{python}
 print(len(train[train["class"] == 1])) # Gamma
@@ -133,7 +143,7 @@ print(len(train[train["class"] == 0])) # Hadron
 ```
 
 
-We want to oversample our data so that these match.
+We want to over-sample our data so that these match.
 
 ```{python}
 train, x_train, y_train = scale_dataset(train, oversample=True)
@@ -142,10 +152,12 @@ test, x_test, y_test = scale_dataset(test, oversample=False)
 ```
 
 
+
 ```{python}
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report
 ```
+
 
 
 ```{python}
@@ -153,9 +165,13 @@ knn_model = KNeighborsClassifier(n_neighbors = 5)
 knn_model.fit(x_train, y_train)
 ```
 
+
+
 ```{python}
 y_pred = knn_model.predict(x_test)
 ```
+
+
 
 
 ```{python}
@@ -165,8 +181,10 @@ print(classification_report(y_test, y_pred))
 
 
 
-* Accuracy is 80%
-* Prescision for hadron is 76% and gamma is 82%
+* Accuracy is 82%
+* Precision for hadron is 76% and gamma is 75%
+
+### Exploring what we mean by Precison, Recal and Accuracy
 
 Precision:
 
