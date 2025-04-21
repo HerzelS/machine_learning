@@ -18,15 +18,23 @@ use_condaenv("base")
 ### Import Packages
 
 ```{python}
+
+# Import necessary libraries
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import RandomOverSampler
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score
+# Generate a synthetic dataset for classification
+from sklearn.datasets import make_classification
 import warnings
 warnings.filterwarnings('ignore')
 ```
+
 
 
 ### Load and Explore the dataset
@@ -377,102 +385,3 @@ print(classification_report(y_test, y_pred))
 ```
 
 
-
-
-```{python}
-# Naive Bayes Explanation and Code
-
-# Import necessary libraries
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score
-
-# Generate a synthetic dataset for classification
-from sklearn.datasets import make_classification
-
-# Naive Bayes: An Intuitive Introduction
-"""
-What is Naive Bayes?
-Naive Bayes is a probabilistic machine learning algorithm based on Bayes' Theorem, and it is particularly well-suited for classification problems. It assumes that the features used for classification are independent, hence the term "naive."
-Despite this assumption often being unrealistic in real-world data (as features are usually correlated), Naive Bayes performs surprisingly well in many cases.
-
-How does Naive Bayes work?
-Naive Bayes classifies data by calculating the posterior probability of each class and selecting the class with the highest probability.
-The formula used is based on Bayes' Theorem:
-
-    P(C | X) = (P(X | C) * P(C)) / P(X)
-
-Where:
-- P(C | X) is the posterior probability of class C given the features X.
-- P(X | C) is the likelihood of observing the features X given class C.
-- P(C) is the prior probability of class C.
-- P(X) is the evidence or probability of the features X.
-
-The "naive" part comes from the assumption that the features X = (x1, x2, ..., xn) are independent, so we can calculate the likelihood as:
-
-    P(X | C) = P(x1 | C) * P(x2 | C) * ... * P(xn | C)
-
-This simplifies the model and makes it computationally feasible.
-"""
-
-# Create a simple 2D dataset for classification
-X, y = make_classification(n_samples=100, n_features=2, n_informative=2, n_classes=2, random_state=42)
-
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-
-# Create and train the Naive Bayes classifier (Gaussian Naive Bayes)
-nb = GaussianNB()
-nb.fit(X_train, y_train)
-
-# Make predictions on the test set
-y_pred = nb.predict(X_test)
-
-# Calculate accuracy
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy of Naive Bayes: {accuracy * 100:.2f}%")
-
-# Visualize the dataset and the decision boundary of Naive Bayes
-plt.figure(figsize=(8, 6))
-
-# Plot the decision boundary
-x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100))
-Z = nb.predict(np.c_[xx.ravel(), yy.ravel()])
-Z = Z.reshape(xx.shape)
-
-plt.contourf(xx, yy, Z, alpha=0.3, cmap=plt.cm.coolwarm)
-plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, s=100, edgecolors='k', cmap=plt.cm.coolwarm, label="Train Data")
-plt.scatter(X_test[:, 0], X_test[:, 1], c=y_test, s=100, edgecolors='k', marker='X', cmap=plt.cm.coolwarm, label="Test Data")
-
-plt.title("Naive Bayes Classification", fontsize=16)
-plt.xlabel("Feature 1", fontsize=14)
-plt.ylabel("Feature 2", fontsize=14)
-plt.legend(loc="upper left")
-plt.show()
-
-```
-
-
-
-Explanation:
-Naive Bayes: I’ve included a brief explanation of Naive Bayes theory at the start of the notebook. You can easily see how the classifier works based on Bayes' Theorem.
-
-Code Implementation:
-
-We generate a synthetic 2D dataset using make_classification and split it into a training and testing set.
-
-We use the Gaussian Naive Bayes classifier from sklearn (GaussianNB) for continuous data.
-
-After training the classifier on the training set (X_train, y_train), predictions are made on the test set (X_test), and accuracy is computed.
-
-Visualization:
-
-The code generates a plot showing the decision boundary learned by the Naive Bayes model, which classifies points into two classes.
-
-The train data is shown with large circles, and the test data is shown with smaller X-marked points.
