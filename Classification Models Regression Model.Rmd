@@ -259,6 +259,8 @@ for label in cols[:-1]:
 
 ### Example 1:  Preparing the Train, Validation and Test Datasets
 
+<br>
+
 ```{python}
 train, valid, test = np.split(df.sample(frac=1), [int(0.6*len(df)), int(0.8*len(df))])
 ```
