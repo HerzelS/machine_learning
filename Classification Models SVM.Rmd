@@ -16,7 +16,9 @@ use_condaenv("base")
 
 ### K Nearest Neighbours (kNN)
 
+## Exploring KNN using the MAGIC gamma telescope dataset
 
+Source: Bock, R. (2004). MAGIC Gamma Telescope [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C52C8B.
 
 ### Import Packages
 
